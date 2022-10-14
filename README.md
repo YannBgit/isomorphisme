@@ -13,7 +13,7 @@ make
 
 - Lancer le programme :
 ```sh
-make run
+./isomorphisme <url>
 ```
 
 - Nettoyer le répertoire des fichiers temporaires et de compilation :
