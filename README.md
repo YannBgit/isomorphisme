@@ -20,3 +20,6 @@ make
 ```sh
 make clean
 ```
+
+url pour les tests du programme :
+https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_lite_3star.sdf.gz

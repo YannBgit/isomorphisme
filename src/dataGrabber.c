@@ -2,12 +2,35 @@
 #include "dataGrabber.h"
 
 // FONCTIONS
-void grab(char *url)
+FILE *grab(char *url)
 {
-	
+	char *get = "cd data; sudo wget ";
+	char *command = malloc((strlen(get)
+	+ strlen(url))
+	* sizeof(char));
+
+	stpcpy(stpcpy(command, get), url);
+
+	int status = system(command);
+
+	free(command);
+
+	if(status != 1)
+	{
+		printf("Erreur de téléchargement du fichier\n");
+
+		exit(1);
+	}
+
+	status = system("gzip -d *.gz");
+
+	return fopen("../data/*.sdf", "r");
 }
 
 void extractMolecules(FILE *f)
 {
-	
+	if(f != NULL)
+	{
+		fclose(f);
+	}
 }

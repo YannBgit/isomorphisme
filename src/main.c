@@ -7,11 +7,14 @@
 // MAIN
 int main(int ac, char **av)
 {
-	grab(av[1]);
+	// Récupération du fichier
+	FILE *f = grab(av[1]);
 
-	FILE *f = fopen("nomDuFichierGrab", "r");
-
+	// Extraction des molécules
 	extractMolecules(f);
 
-	return 0;
+	// Recherche d'isomorphismes
+
+	// Fin
+	exit(0);
 }
