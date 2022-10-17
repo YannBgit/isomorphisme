@@ -6,8 +6,8 @@
 // STRUCTURES
 
 // FONCTIONS
-// Télécharge le fichier (dans ../data) contenant les molécules avec une url et renvoie un pointeur vers le fichier décompressé
-FILE *grab(char *url);
+// Télécharge le fichier (dans ../data) contenant les molécules avec une url et le décompresse
+void grab(char *url);
 
-// Extrait les molécules du fichier téléchargé et les range chacune dans son propre fichier (dans ../data) et ferme le fichier d'extraction
+// Extrait les molécules du fichier téléchargé et les range chacune dans son propre fichier (dans ../data)
 void extractMolecules(FILE *f);

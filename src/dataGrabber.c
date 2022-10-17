@@ -2,7 +2,7 @@
 #include "dataGrabber.h"
 
 // FONCTIONS
-FILE *grab(char *url)
+void grab(char *url)
 {
 	char *get = "cd data; sudo wget ";
 	char *command = malloc((strlen(get)
@@ -15,22 +15,17 @@ FILE *grab(char *url)
 
 	free(command);
 
-	if(status != 1)
+	if(status == -1)
 	{
 		printf("Erreur de téléchargement du fichier\n");
 
 		exit(1);
 	}
 
-	status = system("gzip -d *.gz");
-
-	return fopen("../data/*.sdf", "r");
+	status = system("cd data; gzip -d *.gz");
 }
 
 void extractMolecules(FILE *f)
 {
-	if(f != NULL)
-	{
-		fclose(f);
-	}
+	
 }
