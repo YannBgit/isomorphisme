@@ -8,16 +8,14 @@
 int main(int ac, char **av)
 {
 	// Récupération du fichier
-	grab(av[1]);
-	FILE *f = fopen("/data/*.sdf", "r");
+	FILE *f = grab(av[1]);
 
 	// Extraction des molécules
 	extractMolecules(f);
 
 	// Recherche d'isomorphismes
+	searchAllIsomorphisms();
 
 	// Fin
-	//fclose(f);
-
 	exit(0);
 }
