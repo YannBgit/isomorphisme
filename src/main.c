@@ -1,5 +1,5 @@
 // LIBRAIRIES
-#include "dataGrabber.h"
+#include "recuperateurDonnees.h"
 #include "molecule.h"
 
 // FONCTIONS
@@ -8,13 +8,13 @@
 int main(int ac, char **av)
 {
 	// Récupération du fichier
-	FILE *f = grab(av[1]);
+	FILE *f = recuperer(av[1]);
 
 	// Extraction des molécules
-	extractMolecules(f);
+	extraireMolecules(f);
 
 	// Recherche d'isomorphismes
-	searchAllIsomorphisms();
+	trouverIsomorphismes();
 
 	// Fin
 	exit(0);

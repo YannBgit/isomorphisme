@@ -1,8 +1,8 @@
 // LIBRAIRIES
-#include "dataGrabber.h"
+#include "recuperateurDonnees.h"
 
 // FONCTIONS
-FILE *grab(char *url)
+FILE *recuperer(char *url)
 {
 	char *get = "cd data; sudo wget ";
 	char *command = malloc((strlen(get)
@@ -27,7 +27,7 @@ FILE *grab(char *url)
 	return fopen("/data/*.sdf", "r");
 }
 
-void extractMolecules(FILE *f)
+void extraireMolecules(FILE *f)
 {
 	// Lire le fichier f et stocker chaque molécule dans un fichier à son nom (on ne stock pas toutes les molécules dans une liste de structures MOLECULES pour ne pas exploser la mémoire)
 }
