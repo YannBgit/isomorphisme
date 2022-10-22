@@ -5,10 +5,11 @@
 // FONCTIONS
 
 // MAIN
-int main(int ac, char **av)
+int main()
 {
 	// Récupération du fichier
-	FILE *f = recuperer(av[1]);
+	// FILE *f = fopen("/data/*.sdf", "r"); // Ouvrir un fichier sans réseau
+	FILE *f = recuperer();
 
 	// Extraction des molécules
 	extraireMolecules(f);

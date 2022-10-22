@@ -1,8 +1,4 @@
 // LIBRAIRIES
 
 // CONSTANTES
-// Zéro
-#define ZERO 0
-
-// Un
-#define UN 1
+#define NBR_URL 4

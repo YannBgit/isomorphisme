@@ -13,6 +13,9 @@ OBJ			:= $(SRC:$(SRC_DIR)/%$(SRC_EXT)=$(BUILD_DIR)/%.o)
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
+run: $(NAME)
+	./$(NAME)
+
 $(BUILD_DIR):
 	mkdir $@
 

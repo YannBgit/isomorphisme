@@ -6,20 +6,17 @@ BARBIER Yann \\ ABERKANE Walid \\ GOUY Emeric \\ CHALAUD Jean-Christophe \\ RAZA
 
 Pour exécuter les commandes ci-dessous, ouvrir une console dans le répertoire de ce README.
 
-- Compiler le projet :
+- Compiler le programme :
 ```sh
 make
 ```
 
 - Lancer le programme :
 ```sh
-./isomorphisme <url>
+make run
 ```
 
-- Nettoyer le répertoire des fichiers temporaires et de compilation :
+- Nettoyer le répertoire des fichiers temporaires et de compilation ! SUPPRIME LES FICHIERS TELECHARGES ! :
 ```sh
 make clean
 ```
-
-url pour les tests du programme :
-https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_lite_3star.sdf.gz
