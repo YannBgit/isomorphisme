@@ -12,14 +12,13 @@ FILE *recuperer()
 	Turl[2] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_lite.sdf.gz";
 	Turl[3] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_complete.sdf.gz";
 
-
 	printf("\nIndiquez quel type de fichier vous souhaiteriez utiliser :\nTapez 0 pour le fichier '3 stars lite'\nTapez 1 pour le fichier '3 stars complet'\nTapez 2 pour le fichier 'lite'\nTapez 3 pour le fichier 'complet'\nTapez 4 pour entrer une url custom\nTapez 5 pour utiliser un fichier existant\n");
 
 	int choix = -1;
 
 	while((choix < 0) || (choix > 5))
 	{
-		if(scanf("%d", &choix) && (choix >=0) && (choix < 6))
+		if(scanf("%d", &choix) && (choix >= 0) && (choix < 6))
 		{
 			if(choix == 4)
 			{
@@ -28,6 +27,8 @@ FILE *recuperer()
 				if(!scanf("%ms", &Turl[4]))
 				{
 					printf("Erreur : vérifiez la validité de l'url\n");
+
+					exit(1);
 				}
 			}
 
@@ -35,14 +36,16 @@ FILE *recuperer()
 			{
 				if(choix == 5)
 				{
-					char *data = "/data/";
+					char *data = "data/";
 					char *nomFichier;
 
-					printf("Entrez le nom du fichier existant dans le répertoire /data\n");
+					printf("Entrez le nom du fichier présent dans le répertoire data\n");
 
 					if(!scanf("%ms", &nomFichier))
 					{
-						printf("Erreur : entrez un nom de fichier valide\n");
+						printf("Erreur : vérifiez la validité du nom du fichier\n");
+
+						exit(1);
 					}
 
 					char *chemin = malloc((strlen(data)
@@ -51,7 +54,11 @@ FILE *recuperer()
 
 					stpcpy(stpcpy(chemin, data), nomFichier);
 
-					return fopen(chemin, "r");
+					FILE *f = fopen(chemin, "r");
+
+					free(chemin);
+
+					return f;
 				}
 			}
 
@@ -60,7 +67,7 @@ FILE *recuperer()
 
 		else
 		{
-			printf("Entrée invalide : tapez un numéro entre 0 et 4\n");
+			printf("Entrée invalide : tapez un numéro entre 0 et 5\n");
 		}
 	}
 
@@ -87,19 +94,54 @@ FILE *recuperer()
 	// Décompression du fichier
 	status = system("cd data; gzip -d *.gz");
 
-	return fopen("/data/*.sdf", "r");
+	DIR *d = opendir("data");
+
+	if(d)
+	{
+		char *data = "data/";
+		struct dirent *entree;
+
+		if((entree = readdir(d)) != NULL)
+		{
+			char *nomFichier = readdir(d)->d_name;
+
+			closedir(d);
+
+			char *chemin = malloc((strlen(data)
+			+ strlen(nomFichier))
+			* sizeof(char));
+
+			stpcpy(stpcpy(chemin, data), nomFichier);
+
+			FILE *f = fopen(chemin, "r");
+
+			free(chemin);
+
+			return f;
+		}
+
+		else
+		{
+			printf("Erreur de lecture dans le répertoire data\n");
+
+        	exit(1);
+		}
+	}
+
+	else
+	{
+		printf("Impossible d'ouvrir le répertoire data\n");
+
+        exit(1);
+	}
 }
 
 void extraireMolecules(FILE *f)
 {
-	// Lire le fichier f et stocker chaque molécule dans un fichier à son nom 
-    //(on ne stock pas toutes les molécules dans une liste de structures MOLECULES pour ne pas exploser la mémoire)
-
-    FILE *dest;
+	FILE *dest;
     char filename[50];
     char name[1000];
     char buf[1000] = "";
-    int i = 0;
 
     char *line = NULL;
     size_t n = 0;
@@ -109,41 +151,41 @@ void extraireMolecules(FILE *f)
    
     if(f == NULL)
     {
-        printf("Impossible d'ouvrir le fichier d'entrée\n");
+        printf("Fichier introuvable : extraction des molécules impossible\n");
 
         exit(1);
     }
 
     else
     {
+		printf("Création de fichiers individuels pour chaque molécule...\n");
+
         n = getline(&line, &n, f);
 
-        while(fgets(buf,1000,f) != NULL)
+        for(int i = 0; fgets(buf, 1000, f) != NULL; i++)
 		{
-            //Créé le fichier
+            // Création du fichier
             sprintf(filename, "data/%d.sdf", i);
             dest = fopen(filename, "w");
 
-            //récupere la ligne
+            // Récupération de la ligne
             n = getline(&line, &n, f);
 
-            //tant qu'on n'arrive pas a une prochaine molecule
+            // Tant qu'on n'arrive pas à une prochaine molécule
             while(strcmp(line, "$$$$\n") != 0)
 			{
                 fputs(line, dest);
 
                 if(strcmp(line, "> <ChEBI Name>\n") == 0)
-				{ //renommer le fichier
+				{
                     m = getline(&nom, &m, f);
-                    printf("NOM : %s\n", nom);
-                    sprintf(name,"data/%s.sdf", nom);
+                    sprintf(name, "data/%s.sdf", nom);
                     rename(filename, name);
                 }
 
                 n = getline(&line, &n, f);
             }
 
-            i = i+1;
             fclose(dest);
         }
    }

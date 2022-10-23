@@ -24,7 +24,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%$(SRC_EXT) | $(BUILD_DIR)
 
 clean:
 	rm -rf $(BUILD_DIR) $(NAME)
-	rm -rf $(DATA_DIR)/*
+	rm -rf $(DATA_DIR)
+	mkdir $(DATA_DIR)
 	clear
 
 -include $(OBJ:%$(OBJ_EXT)=%.d)
