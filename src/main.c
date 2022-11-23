@@ -1,6 +1,6 @@
 // LIBRAIRIES
 #include "recuperateurDonnees.h"
-#include "molecule.h"
+#include "famille.h"
 
 // FONCTIONS
 
@@ -15,7 +15,12 @@ int main()
 	extraireMolecules(f);
 
 	// Recherche d'isomorphismes
-	trouverIsomorphismes();
+	int nbFamilles;
+	FAMILLE *Tfamilles;
+	trouverFamilles(&Tfamilles, &nbFamilles);
+
+	// Affichage des familles
+	afficherFamilles(Tfamilles, nbFamilles);
 
 	// Fin
 	exit(0);
