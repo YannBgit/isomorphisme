@@ -8,19 +8,17 @@
 int main()
 {
 	// Récupération du fichier
-	// FILE *f = fopen("data/ChEBI_lite_3star.sdf", "r"); // Ouvrir le fichier lite 3 stars sans réseau
-	FILE *f = recuperer();
+	// FILE *F = fopen("data/ChEBI_lite_3star.sdf", "r"); // Ouvrir le fichier lite 3 stars sans réseau
+	FILE *F = recupererFichier();
 
 	// Extraction des molécules
-	extraireMolecules(f);
+	extraireMolecules(F);
 
 	// Recherche d'isomorphismes
-	int nbFamilles;
-	FAMILLE *Tfamilles;
-	trouverFamilles(&Tfamilles, &nbFamilles);
+	TABLEAUFAMILLES tf = trouverFamilles();
 
 	// Affichage des familles
-	afficherFamilles(Tfamilles, nbFamilles);
+	afficherFamilles(tf);
 
 	// Fin
 	exit(0);

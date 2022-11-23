@@ -2,7 +2,7 @@
 #include "recuperateurDonnees.h"
 
 // FONCTIONS
-FILE *recuperer()
+FILE *recupererFichier()
 {
 	// Choix du fichier
 	char *Turl[NBR_URL + 1];
@@ -136,7 +136,7 @@ FILE *recuperer()
 	}
 }
 
-void extraireMolecules(FILE *f)
+void extraireMolecules(FILE *F)
 {
 	FILE *dest;
     char filename[50];
@@ -149,7 +149,7 @@ void extraireMolecules(FILE *f)
     char *nom = NULL;
     size_t m = 0;
    
-    if(f == NULL)
+    if(F == NULL)
     {
         printf("Fichier introuvable : extraction des molécules impossible\n");
 
@@ -160,16 +160,16 @@ void extraireMolecules(FILE *f)
     {
 		printf("Création de fichiers individuels pour chaque molécule...\n");
 
-        n = getline(&line, &n, f);
+        n = getline(&line, &n, F);
 
-        for(int i = 0; fgets(buf, 1000, f) != NULL; i++)
+        for(int i = 0; fgets(buf, 1000, F) != NULL; i++)
 		{
             // Création du fichier
             sprintf(filename, "data/%d.sdf", i);
             dest = fopen(filename, "w");
 
             // Récupération de la ligne
-            n = getline(&line, &n, f);
+            n = getline(&line, &n, F);
 
             // Tant qu'on n'arrive pas à une prochaine molécule
             while(strcmp(line, "$$$$\n") != 0)
@@ -178,17 +178,17 @@ void extraireMolecules(FILE *f)
 
                 if(strcmp(line, "> <ChEBI Name>\n") == 0)
 				{
-                    m = getline(&nom, &m, f);
+                    m = getline(&nom, &m, F);
                     sprintf(name, "data/%s.sdf", nom);
                     rename(filename, name);
                 }
 
-                n = getline(&line, &n, f);
+                n = getline(&line, &n, F);
             }
 
             fclose(dest);
         }
    }
 
-   fclose(f);
+   fclose(F);
 }
