@@ -136,6 +136,31 @@ FILE *recupererFichier()
 	}
 }
 
+char *recupererNomFichier(char *dir)
+{
+	struct dirent *dp;
+	DIR *dfd;
+
+	if((dfd = opendir(dir)) == NULL)
+	{
+		printf("Impossible d'ouvrir %s\n", dir);
+		
+		return;
+	}
+
+	if((dp = readdir(dfd)) != NULL)
+	{
+		return dp->d_name;
+    }
+
+	else
+	{
+		printf("Erreur : répertoire vide\n");
+
+		return;
+	}
+}
+
 void extraireMolecules(FILE *F)
 {
 	FILE *dest;

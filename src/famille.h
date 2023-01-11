@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <dirent.h>
 #include <nauty.h>
 
 // STRUCTURES
@@ -29,10 +30,13 @@ FAMILLE creerFamille(char *m, int g);
 void ajouterMoleculeDansFamille(char *m, FAMILLE f);
 
 // Convertit une molécule donnée à la fonction en tant que son fichier de stockage et renvoie le graphe de cette molécule
-graph *molecule_vers_graphe(FILE *F);
+graph *moleculeVersGrapheraphe(FILE *F);
+
+// Prend en argument le chemin vers un répertoire et retourne une liste des noms de tous les fichiers qu'il contient
+char **tableauFichiers(char *dir, char *ignore);
 
 // Cherche les isomorphismes entre les molécules et renvoie le tableau des familles de molécules isomorphes
-TABLEAUFAMILLES trouverFamilles();
+TABLEAUFAMILLES trouverFamilles(char *dir, char *nomSource);
 
 // Affiche les noms des molécules triées par famille
 void afficherFamilles(TABLEAUFAMILLES tf);
