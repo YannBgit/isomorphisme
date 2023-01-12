@@ -2,30 +2,40 @@
 #include "famille.h"
 
 // FONCTIONS
-FAMILLE creerFamille(char *m, int g)
+char **tableauFichiers(int *nbTotalMolecules, char *dir, char *ignore)
 {
-	FAMILLE f;
+	nbTotalMolecules = 0;
+	char **allfiles = malloc(sizeof(char **));
+	struct dirent *dp;
+	DIR *dfd;
 
-	f.nbMolecules = 1;
-	f.graphe = g;
-	f.molecules = malloc(strlen(m) * sizeof(char));
-	f.molecules[f.nbMolecules - 1] = m;
+	if((dfd = opendir(dir)) == NULL)
+	{
+		printf("Impossible d'ouvrir %s\n", dir);
+		
+		exit(1);
+	}
 
-	return f;
+	while((dp = readdir(dfd)) != NULL)
+	{
+		if(strcmp(dp->d_name, ignore) == 0)
+			continue;
+
+		*allfiles++ = dp->d_name;
+		++allfiles;
+		nbTotalMolecules++;
+    }
+
+    closedir(dfd);
+	
+    return allfiles;
 }
 
-void ajouterMoleculeDansFamille(char *m, FAMILLE f)
-{
-	f.nbMolecules++;
-	f.molecules = realloc(f.molecules, (sizeof(f.molecules) + (strlen(m) * sizeof(char))));
-	f.molecules[f.nbMolecules - 1] = m;
-}
-
-graph *moleculeVersGraphe(FILE *F)
+graph moleculeVersGraphe(FILE *F)
 {
 	if(F == NULL)
     {
-        printf("Fichier introuvable : extraction du graphe impossible\n");
+        printf("Fichier introuvable : conversion en graphe impossible\n");
 
         exit(1);
     }
@@ -45,9 +55,9 @@ graph *moleculeVersGraphe(FILE *F)
 
 	fclose(F);
 
-	graph *g;
+	graph g;
 
-	g = (graph*)malloc(sommets * aretes * sizeof(graph));
+	g = malloc(sommets * aretes * sizeof(graph));
 
 	// Initialise le graphe vide
 	for(int i = 0; i < sommets; i++)
@@ -70,66 +80,83 @@ graph *moleculeVersGraphe(FILE *F)
 		printf("\n");
 	}
 	*/
-
-	// Libère la mémoire allouée, A FAIRE A LA TOUTE FIN DU PROGRAMME
-	free(g);
 }
 
-char **tableauFichiers(char *dir, char *ignore)
+bool graphesIdentiques(graph g1, graph g2)
 {
-	char **allfiles = malloc(sizeof(char **));
-	struct dirent *dp;
-	DIR *dfd;
+	// Comparer les graphes g1 et g2, renvoyer true s'ils sont identiques, false sinon
 
-	if((dfd = opendir(dir)) == NULL)
+	return true;
+}
+
+int recupererIndiceFamille(graph g, TABLEAUFAMILLES tf)
+{
+	for(int i = 0; i < tf.nbFamilles; i++)
 	{
-		printf("Impossible d'ouvrir %s\n", dir);
-		
-		return;
+		if(graphesIdentiques(g, tf.familles[i].graphe))
+		{
+			return i;
+		}
 	}
 
-	while((dp = readdir(dfd)) != NULL)
-	{
-		if(strcmp(dp->d_name, ignore) == 0)
-			continue;
-
-		*allfiles++ = dp->d_name;
-		++allfiles;
-    }
-
-    closedir(dfd);
-	
-    return allfiles;
+	return -1;
 }
 
-TABLEAUFAMILLES trouverFamilles(char *dir, char *nomSource)
+void ajouterMoleculeDansFamille(TABLEAUFAMILLES tf, int indiceFamille, char *m)
 {
+	tf.familles[indiceFamille].nbMolecules++;
+	tf.familles[indiceFamille].nomMolecules = realloc(tf.familles[indiceFamille].nomMolecules, sizeof(tf.familles[indiceFamille].nomMolecules) + (strlen(m) * sizeof(char)));
+	tf.familles[indiceFamille].nomMolecules[tf.familles[indiceFamille].nbMolecules - 1] = m;
+}
+
+void nouvelleFamille(TABLEAUFAMILLES tf, char *m, graph g)
+{
+	FAMILLE f;
+
+	f.graphe = g;
+	f.nbMolecules = 1;
+	f.nomMolecules = malloc(strlen(m) * sizeof(char));
+	f.nomMolecules[f.nbMolecules - 1] = m;
+
+	tf.nbFamilles++;
+	tf.familles = realloc(tf.familles, tf.nbFamilles * sizeof(FAMILLE));
+	tf.familles[tf.nbFamilles - 1] = f;
+}
+
+TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
+{
+	// Création du tableau de familles
 	TABLEAUFAMILLES tf;
-
-	tf.nbTotalMolecules = 0;
 	tf.nbFamilles = 0;
-	char **nomsFichiers = tableauFichiers(dir, nomSource);
 
-	for(int i = 0; i < sizeof(nomsFichiers) / sizeof(nomsFichiers[0]); i++)
+	// Stockage du nombre total de molécules et du nom des fichiers de toutes les molécules
+	int nbTotalMolecules;
+	char **nomsFichiers = tableauFichiers(&nbTotalMolecules, dir, ignore);
+
+	// On boucle sur tous les fichiers
+	for(int i = 0; i < nbTotalMolecules; i++)
 	{
+		// Ouverture du fichier de la molécule courante
 		FILE *F = fopen(strcat(dir, nomsFichiers[i]), "r");
 
-		// Calculer le graphe de la molécule
-		moleculeVersGraphe(F);
+		// Calcul du graphe de la molécule courante
+		graph g = moleculeVersGraphe(F);
 
-		if(1)
+		// On cherche l'indice de la famille à laquele appartient la molécule courante
+		int indiceFamille = recupererIndiceFamille(g, tf);
+
+		// Si l'indice ne vaut pas -1, on stock la molécule dans sa famille, sinon, on crée une famille
+		if(indiceFamille != -1)
 		{
-			// Si la molécule est isomorphe à l'une des molécules en tête d'une famille, appeler ajouterMoleculeDansFamille()
-			// ajouterMoleculeFamille(nomsFichiers[i], );
+			// Ajout de la molécule courante dans sa famille
+			ajouterMoleculeDansFamille(tf, indiceFamille, nomsFichiers[i]);
 		}
 
 		else
 		{
-			// Sinon appeler creerFamille()
-			// creerFamille(nomsFichiers[i], );
+			// Création d'une nouvelle famille
+			nouvelleFamille(tf, nomsFichiers[i], g);
 		}
-
-		free(nomsFichiers[i]);
 	}
 
 	return tf;
@@ -143,9 +170,14 @@ void afficherFamilles(TABLEAUFAMILLES tf)
 
 		for(int j = 0; j < tf.familles[i].nbMolecules; j++)
 		{
-			printf("%s\n", tf.familles[i].molecules[j]);
+			printf("%s\n", tf.familles[i].nomMolecules[j]);
 		}
 
 		printf("\n");
 	}
+}
+
+void libererMemoire(TABLEAUFAMILLES tf)
+{
+
 }

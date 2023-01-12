@@ -16,10 +16,12 @@ int main()
 	extraireMolecules(F);
 
 	// Recherche d'isomorphismes
-	TABLEAUFAMILLES tf = trouverFamilles("data", nomSource);
+	TABLEAUFAMILLES tf = classerMolecules("data", nomSource);
 
 	// Affichage des familles
 	afficherFamilles(tf);
+
+	libererMemoire(tf);
 
 	// Fin
 	exit(0);
