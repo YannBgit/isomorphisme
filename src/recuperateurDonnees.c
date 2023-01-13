@@ -6,12 +6,17 @@ FILE *recupererFichier()
 {
 	// Choix du fichier
 	char *Turl[NBR_URL + 1];
+	char *finalfilenames[NBR_URL + 1];
 
 	Turl[0] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_lite_3star.sdf.gz";
 	Turl[1] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_complete_3star.sdf.gz";
 	Turl[2] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_lite.sdf.gz";
 	Turl[3] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_complete.sdf.gz";
 
+	finalfilenames[0] = "ChEBI_lite_3star.sdf";
+	finalfilenames[1] = "ChEBI_complete_3star.sdf";
+	finalfilenames[2] = "ChEBI_lite.sdf";
+	finalfilenames[3] = "ChEBI_complete.sdf";
 	printf("\nIndiquez quel type de fichier vous souhaiteriez utiliser :\nTapez 0 pour le fichier '3 stars lite'\nTapez 1 pour le fichier '3 stars complet'\nTapez 2 pour le fichier 'lite'\nTapez 3 pour le fichier 'complet'\nTapez 4 pour entrer une url custom\nTapez 5 pour utiliser un fichier existant\n");
 
 	int choix = -1;
@@ -108,10 +113,10 @@ FILE *recupererFichier()
 			closedir(d);
 
 			char *chemin = malloc((strlen(data)
-			+ strlen(nomFichier))
+			+ strlen(finalfilenames[choix]) + 1)
 			* sizeof(char));
 
-			stpcpy(stpcpy(chemin, data), nomFichier);
+			stpcpy(stpcpy(chemin, data), finalfilenames[choix]);
 
 			FILE *f = fopen(chemin, "r");
 
@@ -144,21 +149,18 @@ char *recupererNomFichier(char *dir)
 	if((dfd = opendir(dir)) == NULL)
 	{
 		printf("Impossible d'ouvrir %s\n", dir);
-		
-		return;
-	}
-
-	if((dp = readdir(dfd)) != NULL)
-	{
-		return dp->d_name;
-    }
-
-	else
-	{
-		printf("Erreur : répertoire vide\n");
 
 		return;
 	}
+	while((dp = readdir(dfd)) != NULL){
+		int n = strlen(dp->d_name);
+		if(n >= 4){
+			if( strcmp(&(dp->d_name[n-4]), ".sdf") == 0 )
+				return dp->d_name;
+	  }
+	}
+	printf("Erreur : fichier non trouve\n");
+	return NULL;
 }
 
 void extraireMolecules(FILE *F)
@@ -166,14 +168,14 @@ void extraireMolecules(FILE *F)
 	FILE *dest;
     char filename[50];
     char name[1000];
-    char buf[1000] = "";
+    //char buf[1000] = "";
 
     char *line = NULL;
     size_t n = 0;
 
     char *nom = NULL;
     size_t m = 0;
-   
+
     if(F == NULL)
     {
         printf("Fichier introuvable : extraction des molécules impossible\n");
@@ -183,37 +185,49 @@ void extraireMolecules(FILE *F)
 
     else
     {
-		printf("Création de fichiers individuels pour chaque molécule...\n");
+			printf("Création de fichiers individuels pour chaque molécule...\n");
 
-        n = getline(&line, &n, F);
+	   	//n = getline(&line, &n, F);
+			int i = 0;
+	   	while(1)
+		 	{
+				// Récupération de la ligne
+				n = 0;
+				if(line) free(line);
+	      n = getline(&line, &n, F);
+				if(n == -1){ //break on EOF, TODO error handling
+					break;
+				}
 
-        for(int i = 0; fgets(buf, 1000, F) != NULL; i++)
-		{
-            // Création du fichier
-            sprintf(filename, "data/%d.sdf", i);
-            dest = fopen(filename, "w");
+	      // Création du fichier
+	      sprintf(filename, "data/%d.sdf", i);
+	      dest = fopen(filename, "w");
 
-            // Récupération de la ligne
-            n = getline(&line, &n, F);
 
-            // Tant qu'on n'arrive pas à une prochaine molécule
-            while(strcmp(line, "$$$$\n") != 0)
-			{
-                fputs(line, dest);
-
-                if(strcmp(line, "> <ChEBI Name>\n") == 0)
+	      // Tant qu'on n'arrive pas à une prochaine molécule
+	      while(strcmp(line, "$$$$\n") != 0)
 				{
-                    m = getline(&nom, &m, F);
-                    sprintf(name, "data/%s.sdf", nom);
-                    rename(filename, name);
-                }
+	        fputs(line, dest);
 
-                n = getline(&line, &n, F);
-            }
+	        if(strcmp(line, "> <ChEBI Name>\n") == 0)
+					{
+						m = 0;
+						m = getline(&nom, &m, F);
+						fputs(nom, dest);
+						nom[m-1] = 0; //strip newline from nom
+	          sprintf(name, "data/%s.sdf", nom);
+	        }
+					n = 0;
+					if(line) free(line);
+	        n = getline(&line, &n, F);
+	      }
 
-            fclose(dest);
-        }
-   }
-
-   fclose(F);
+	      fclose(dest);
+				rename(filename, name);
+				if(nom) free(nom);
+				i+=1;
+	    }
+			printf("Number of files written : %d\n", i);
+	}
+  fclose(F);
 }

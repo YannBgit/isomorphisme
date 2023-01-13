@@ -1,7 +1,6 @@
 // LIBRAIRIES
 #include "recuperateurDonnees.h"
-#include "famille.h"
-
+#include <stdlib.h>
 // FONCTIONS
 
 // MAIN
@@ -15,11 +14,14 @@ int main()
 	// Extraction des molécules
 	extraireMolecules(F);
 
+	char command[200];
+	sprintf(command, "rm data/%s", nomSource);
+	system(command);
 	// Recherche d'isomorphismes
-	TABLEAUFAMILLES tf = trouverFamilles("data", nomSource);
+	//TABLEAUFAMILLES tf = trouverFamilles("data", nomSource);
 
 	// Affichage des familles
-	afficherFamilles(tf);
+	//afficherFamilles(tf);
 
 	// Fin
 	exit(0);
