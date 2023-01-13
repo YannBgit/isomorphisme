@@ -6,6 +6,8 @@ BARBIER Yann \\ ABERKANE Walid \\ GOUY Emeric \\ CHALAUD Jean-Christophe \\ RAZA
 
 Pour exécuter les commandes ci-dessous, ouvrir une console dans le répertoire de ce README.
 
+Ce projet nécessite ``python3`` avec la librairie ``pynauty`` ([lien pour pynauty](https://pypi.org/project/pynauty/)) pour être utilisé
+
 - Compiler le programme :
 ```sh
 make
