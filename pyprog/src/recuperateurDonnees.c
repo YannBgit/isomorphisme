@@ -80,7 +80,7 @@ FILE *recupererFichier()
 	char *url = Turl[choix];
 	char *get = "cd data; sudo wget ";
 	char *command = malloc((strlen(get)
-	+ strlen(url))
+	+ strlen(url) + 1)
 	* sizeof(char));
 
 	stpcpy(stpcpy(command, get), url);
