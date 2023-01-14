@@ -145,7 +145,7 @@ char *recupererNomFichier(char *dir)
 	{
 		printf("Impossible d'ouvrir %s\n", dir);
 		
-		return;
+		exit(1);
 	}
 
 	if((dp = readdir(dfd)) != NULL)
@@ -157,7 +157,7 @@ char *recupererNomFichier(char *dir)
 	{
 		printf("Erreur : répertoire vide\n");
 
-		return;
+		exit(1);
 	}
 }
 

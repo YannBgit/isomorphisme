@@ -40,46 +40,11 @@ graph moleculeVersGraphe(FILE *F)
         exit(1);
     }
 
-	char *line = NULL;
-    size_t n = 0;
-
-	char *toParse;
-
-	while(strcmp(line, "\n") != 0)
-	{
-		toParse = getline(&line, &n, F);
-	}
-
-	int sommets = toParse[1];
-	int aretes = toParse[3];
-
 	fclose(F);
 
-	graph g;
+	graph g = (graph) 0;
 
-	g = malloc(sommets * aretes * sizeof(graph));
-
-	// Initialise le graphe vide
-	for(int i = 0; i < sommets; i++)
-	{
-		EMPTYGRAPH(g, sommets, aretes);
-	}
-
-	// Ajoute une arête à g du sommet 0 au sommet 1 avec m le nombre d'arêtes
-	ADDONEEDGE(g, 0, 1, aretes);
-
-	// Print le graphe (pour debug uniqument)
-	/*
-	for(int i = 0; i < sommets; i++)
-	{
-		for(int j = 0; j < sommets; j++)
-		{
-			printf("%d ", ISELEMENT(g, i, j));
-		}
-
-		printf("\n");
-	}
-	*/
+	return g;
 }
 
 bool graphesIdentiques(graph g1, graph g2)
@@ -130,7 +95,7 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 	tf.nbFamilles = 0;
 
 	// Stockage du nombre total de molécules et du nom des fichiers de toutes les molécules
-	int nbTotalMolecules;
+	int nbTotalMolecules = 0;
 	char **nomsFichiers = tableauFichiers(&nbTotalMolecules, dir, ignore);
 
 	// On boucle sur tous les fichiers
