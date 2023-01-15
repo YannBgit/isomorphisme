@@ -8,11 +8,11 @@ int main()
 {
 	// Récupération du fichier
 	// FILE *F = fopen("data/ChEBI_lite_3star.sdf", "r"); // Ouvrir le fichier lite 3 stars sans réseau
-	//FILE *F = recupererFichier();
-	//char *nomSource = recupererNomFichier("data");
+	FILE *F = recupererFichier();
+	char *nomSource = recupererNomFichier("data");
 
 	// Extraction des molécules
-	//extraireMolecules(F);
+	extraireMolecules(F);
 	// Recherche d'isomorphismes
 
 	TABLEAUFAMILLES tf = classerMolecules("data", "ChEBI_lite_3star.sdf");
@@ -20,6 +20,7 @@ int main()
 	// Affichage des familles
 	afficherFamilles(tf);
 
+	//TODO
 	libererMemoire(tf);
 
 	// Fin
