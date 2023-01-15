@@ -115,8 +115,7 @@ FILE *recupererFichier()
 			char *chemin = malloc((strlen(data)
 			+ strlen(finalfilenames[choix]) + 1)
 			* sizeof(char));
-
-			stpcpy(stpcpy(chemin, data), finalfilenames[choix]);
+			sprintf(chemin, "%s%s", data, finalfilenames[choix]);
 
 			FILE *f = fopen(chemin, "r");
 
