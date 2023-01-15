@@ -16,7 +16,6 @@ int main()
 	// Recherche d'isomorphismes
 
 	TABLEAUFAMILLES tf = classerMolecules("data", nomSource);
-	//TABLEAUFAMILLES tf = classerMolecules("data_test", "aaaaaa");
 	// Affichage des familles
 	afficherFamilles(tf);
 
