@@ -6,7 +6,7 @@ BARBIER Yann \\ ABERKANE Walid \\ GOUY Emeric \\ CHALAUD Jean-Christophe \\ RAZA
 
 Pour exécuter les commandes ci-dessous, ouvrir une console dans le répertoire de ce README.
 
-Ce projet nécessite ``python3`` avec la librairie ``pynauty`` ([lien pour pynauty](https://pypi.org/project/pynauty/)) pour être utilisé
+Ce projet nécessite d'insérer manuellement les fichiers de la libraire nauty (`nauty.h` et `nauty.a`) dans le dossier `/lib`
 
 - Compiler le programme :
 ```sh
