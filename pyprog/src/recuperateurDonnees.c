@@ -154,8 +154,10 @@ char *recupererNomFichier(char *dir)
 	while((dp = readdir(dfd)) != NULL){
 		int n = strlen(dp->d_name);
 		if(n >= 4){
-			if( strcmp(&(dp->d_name[n-4]), ".sdf") == 0 )
+			if( strcmp(&(dp->d_name[n-4]), ".sdf") == 0 ){
+				closedir(dfd);
 				return dp->d_name;
+			}
 	  }
 	}
 	printf("Erreur : fichier non trouve\n");
@@ -195,6 +197,7 @@ void extraireMolecules(FILE *F)
 				if(line) free(line);
 	      n = custom_getline(&line, &n, F);
 				if(n == -1){ //break on EOF, TODO error handling
+					free(line);
 					break;
 				}
 

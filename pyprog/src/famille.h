@@ -52,5 +52,8 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore);
 // Affiche les noms des molécules triées par famille
 void afficherFamilles(TABLEAUFAMILLES tf);
 
+// Libère la mémoire d'une famille
+void freeFamille(FAMILLE f);
+
 // Libère toute la mémoire utilisée par le tableau de familles, comprenant les graphes, les tableaux de noms de molécules et les tableaux de familles
 void libererMemoire(TABLEAUFAMILLES tf);

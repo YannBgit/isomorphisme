@@ -179,10 +179,17 @@ bool graphesIdentiques(GRAPH_NAUTY g1, GRAPH_NAUTY g2)
 	densenauty(g1.g,lab,ptn,orbits,&options,&stats,g1.m,g1.n,cg1);
 	densenauty(g2.g,lab,ptn,orbits,&options,&stats,g2.m,g2.n,cg2);
 
+	//compare canonically labeled graphs
 	bool is_isomorphic = true;
 	for (int k = 0; k < g1.m*(size_t)g1.n; ++k)
 		if (cg1[k] != cg2[k])
 			is_isomorphic = false;
+
+	DYNFREE(lab, lab_sz);
+	DYNFREE(ptn, ptn_sz);
+	DYNFREE(orbits, orbits_sz);
+	DYNFREE(cg1, cg1_sz);
+	DYNFREE(cg2, cg2_sz);
 	return is_isomorphic;
 }
 
@@ -257,6 +264,8 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 		{
 			// Ajout de la molécule courante dans sa famille
 			ajouterMoleculeDansFamille(tf, indiceFamille, nomsFichiers[i]);
+			// Le graphe est déjà stocké dans la famille, il faut le free.
+			free(g.g);
 		}
 
 		else
@@ -265,8 +274,9 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 			nouvelleFamille(&tf, nomsFichiers[i], g);
 		}
 		free(filename);
+		free(nomsFichiers[i]);
 	}
-
+	free(nomsFichiers);
 	return tf;
 }
 
@@ -285,7 +295,17 @@ void afficherFamilles(TABLEAUFAMILLES tf)
 	}
 }
 
+void freeFamille(FAMILLE f){
+	free(f.graphe.g);
+	for(int i = 0; i<f.nbMolecules; ++i)
+		free(f.nomMolecules[i]);
+	free(f.nomMolecules);
+}
+
 void libererMemoire(TABLEAUFAMILLES tf)
 {
-
+	for(int i = 0; i < tf.nbFamilles; i++){
+		freeFamille(tf.familles[i]);
+	}
+	free(tf.familles);
 }

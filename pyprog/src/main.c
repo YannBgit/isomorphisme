@@ -19,7 +19,6 @@ int main()
 	// Affichage des familles
 	afficherFamilles(tf);
 
-	//TODO
 	libererMemoire(tf);
 
 	// Fin
