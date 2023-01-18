@@ -1,6 +1,6 @@
 // LIBRAIRIES
 #include "recuperateurDonnees.h"
-
+#include "custom_getline.h"
 // FONCTIONS
 FILE *recupererFichier()
 {
@@ -186,14 +186,14 @@ void extraireMolecules(FILE *F)
     {
 			printf("Création de fichiers individuels pour chaque molécule...\n");
 
-	   	//n = getline(&line, &n, F);
+	   	//n = custom_getline(&line, &n, F);
 			int i = 0;
 	   	while(1)
 		 	{
 				// Récupération de la ligne
 				n = 0;
 				if(line) free(line);
-	      n = getline(&line, &n, F);
+	      n = custom_getline(&line, &n, F);
 				if(n == -1){ //break on EOF, TODO error handling
 					break;
 				}
@@ -211,14 +211,14 @@ void extraireMolecules(FILE *F)
 	        if(strcmp(line, "> <ChEBI Name>\n") == 0)
 					{
 						m = 0;
-						m = getline(&nom, &m, F);
+						m = custom_getline(&nom, &m, F);
 						fputs(nom, dest);
 						nom[m-1] = 0; //strip newline from nom
 	          sprintf(name, "data/%s.sdf", nom);
 	        }
 					n = 0;
 					if(line) free(line);
-	        n = getline(&line, &n, F);
+	        n = custom_getline(&line, &n, F);
 	      }
 
 	      fclose(dest);

@@ -1,5 +1,6 @@
 // LIBRAIRIES
 #include "famille.h"
+#include "custom_getline.h"
 #include <errno.h>
 // FONCTIONS
 char **tableauFichiers(int *nbTotalMolecules, char *dir, char *ignore)
@@ -70,7 +71,7 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 	for(int i = 0; i<3; ++i){
 		line = NULL;
 		l = 0;
-		if(getline(&line, &l, F) == -1){
+		if(custom_getline(&line, &l, F) == -1){
 			printf("moleculeVersGraphe - skip 3 : read error\n");
 			exit(1);
 		}
@@ -81,7 +82,7 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 	char *endptr;
 	line = NULL;
 	l = 0;
-	if(getline(&line, &l, F) == -1){
+	if(custom_getline(&line, &l, F) == -1){
 		printf("moleculeVersGraphe - header : read error\n");
 		exit(1);
 	}
@@ -109,7 +110,7 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 	for(int i = 0; i<n; ++i){
 		line = NULL;
 		l = 0;
-		if(getline(&line, &l, F) == -1){
+		if(custom_getline(&line, &l, F) == -1){
 			printf("moleculeVersGraphe - skip atoms : read error\n");
 			exit(1);
 		}
@@ -121,7 +122,7 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 	for(int i = 0; i<m; ++i){
 		line = NULL;
 		l = 0;
-		if(getline(&line, &l, F) == -1){
+		if(custom_getline(&line, &l, F) == -1){
 			printf("moleculeVersGraphe - edge #%d : read error\n", i);
 			exit(1);
 		}
