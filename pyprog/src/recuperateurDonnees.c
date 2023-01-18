@@ -108,8 +108,6 @@ FILE *recupererFichier()
 
 		if((entree = readdir(d)) != NULL)
 		{
-			char *nomFichier = readdir(d)->d_name;
-
 			closedir(d);
 
 			char *chemin = malloc((strlen(data)
@@ -148,8 +146,7 @@ char *recupererNomFichier(char *dir)
 	if((dfd = opendir(dir)) == NULL)
 	{
 		printf("Impossible d'ouvrir %s\n", dir);
-
-		return;
+		return NULL;
 	}
 	while((dp = readdir(dfd)) != NULL){
 		int n = strlen(dp->d_name);
