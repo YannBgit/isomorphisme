@@ -12,6 +12,7 @@ FILE *recupererFichier()
 	Turl[1] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_complete_3star.sdf.gz";
 	Turl[2] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_lite.sdf.gz";
 	Turl[3] = "https://ftp.ebi.ac.uk/pub/databases/chebi/SDF/ChEBI_complete.sdf.gz";
+	Turl[4] = NULL;
 
 	finalfilenames[0] = "ChEBI_lite_3star.sdf";
 	finalfilenames[1] = "ChEBI_complete_3star.sdf";
@@ -28,11 +29,11 @@ FILE *recupererFichier()
 			if(choix == 4)
 			{
 				printf("Entrez l'url du fichier désiré\n");
-
-				if(!scanf("%ms", &Turl[4]))
+				Turl[4] = malloc(1025 * sizeof(char));
+				if(!scanf("%1024s", Turl[4]))
 				{
 					printf("Erreur : vérifiez la validité de l'url\n");
-
+					free(Turl[4]);
 					exit(1);
 				}
 			}
@@ -42,11 +43,11 @@ FILE *recupererFichier()
 				if(choix == 5)
 				{
 					char *data = "data/";
-					char *nomFichier;
+					char *nomFichier = malloc(1025*sizeof(char));
 
 					printf("Entrez le nom du fichier présent dans le répertoire data\n");
 
-					if(!scanf("%ms", &nomFichier))
+					if(!scanf("%1024s", nomFichier))
 					{
 						printf("Erreur : vérifiez la validité du nom du fichier\n");
 
@@ -54,15 +55,14 @@ FILE *recupererFichier()
 					}
 
 					char *chemin = malloc((strlen(data)
-					+ strlen(nomFichier))
+					+ strlen(nomFichier) + 1)
 					* sizeof(char));
-
-					stpcpy(stpcpy(chemin, data), nomFichier);
+					sprintf(chemin, "%s%s", data, nomFichier);
 
 					FILE *f = fopen(chemin, "r");
 
 					free(chemin);
-
+					free(nomFichier);
 					return f;
 				}
 			}
@@ -82,8 +82,7 @@ FILE *recupererFichier()
 	char *command = malloc((strlen(get)
 	+ strlen(url) + 1)
 	* sizeof(char));
-
-	stpcpy(stpcpy(command, get), url);
+	sprintf(command, "%s%s", get, url);
 
 	int status = system(command);
 
