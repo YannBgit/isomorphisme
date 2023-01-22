@@ -37,20 +37,20 @@ char **tableauFichiers(int *nbTotalMolecules, char *dir, char *ignore)
 		{
 			if(strcmp(dp->d_name, ignore) == 0 || strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0)
 				continue;
-			printf("tableauFichiers : adding file %s\n", dp->d_name);
+			//printf("tableauFichiers : adding file %s\n", dp->d_name);
 			allfiles[k] = malloc(strlen(dp->d_name)+1);
 			if(allfiles[k] == NULL){
 				printf("tableauFichiers : error while malloc'ing\n");
 			}
 			memcpy(allfiles[k], dp->d_name, strlen(dp->d_name)+1);
-			printf("%s\n", allfiles[k]);
-			printf("copied");
+			//printf("%s\n", allfiles[k]);
+			//printf("copied");
 
-			printf("%d\n", k);
+			//printf("%d\n", k);
 			k++;
 	  }
 
-	    closedir(dfd);
+	  closedir(dfd);
 
     return allfiles;
 		printf("Exit tableauFichiers\n");
@@ -107,13 +107,19 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
   }
 	if(line) free(line);
 	//skip atom lines    TODO : take in account atoms
+	char **colors = malloc(n*sizeof(char*));
 	for(int i = 0; i<n; ++i){
+		colors[i] = malloc(4);
 		line = NULL;
 		l = 0;
 		if(custom_getline(&line, &l, F) == -1){
 			printf("moleculeVersGraphe - skip atoms : read error\n");
 			exit(1);
 		}
+		memcpy(colors[i], &line[31], 3);
+		colors[i][3] = 0;
+		//printf("%s\n", colors[i]);
+		//printf("atom %d : color %s\n", i, colors[i]);
 		if(line) free(line);
 	}
 	//create graph & read edges
@@ -149,7 +155,12 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 		ADDONEEDGE(g, e1-1, e2-1, m);
 		if(line) free(line);
 	}
-	GRAPH_NAUTY gn = {.n = n, .m = m, .size=(m)*(n)*sizeof(graph), .g=g};
+	GRAPH_NAUTY gn = {.n = n,
+			              .m = m,
+										.size=(m)*(n)*sizeof(graph),
+										.g=g,
+										.colors = colors,
+									 };
 	return gn;
 }
 
@@ -157,6 +168,8 @@ bool graphesIdentiques(GRAPH_NAUTY g1, GRAPH_NAUTY g2)
 {
 	if(g1.n != g2.n || g1.m != g2.m)
 		return false;
+	if(g1.m == 0)
+		return true;
 	// Comparer les graphes g1 et g2, renvoyer true s'ils sont identiques, false sinon
 	DEFAULTOPTIONS_GRAPH(options);
 	options.getcanon = TRUE;
@@ -206,23 +219,98 @@ int recupererIndiceFamille(GRAPH_NAUTY g, TABLEAUFAMILLES tf)
 	return -1;
 }
 
-void ajouterMoleculeDansFamille(TABLEAUFAMILLES tf, int indiceFamille, char *m)
+char **colorMapping(GRAPH_NAUTY to_map, FAMILLE ref){
+	GRAPH_NAUTY g1 = to_map;
+	GRAPH_NAUTY g2 = ref.graphe;
+	if(g1.n != g2.n || g1.m != g2.m)
+		return NULL;
+	//TODO : il y a un problème interne à nauty avec les graphes à 0 arêtes, à investiguer
+	if(g1.m == 0){
+		return NULL;
+	}
+	// Comparer les graphes g1 et g2, renvoyer true s'ils sont identiques, false sinon
+	DEFAULTOPTIONS_GRAPH(options);
+	options.getcanon = TRUE;
+	options.defaultptn = TRUE;
+
+	DYNALLSTAT(int,lab1,lab1_sz);
+	DYNALLSTAT(int,lab2,lab2_sz);
+	DYNALLOC1(int,lab1,lab1_sz,g1.n,"malloc");
+	DYNALLOC1(int,lab2,lab2_sz,g1.n,"malloc");
+	//ignored parameters
+	DYNALLSTAT(int,ptn,ptn_sz);
+	DYNALLSTAT(int,orbits,orbits_sz);
+	DYNALLOC1(int,ptn,ptn_sz,g1.n,"malloc");
+	DYNALLOC1(int,orbits,orbits_sz,g1.n,"malloc");
+	statsblk stats;
+	//store canonically labeled graphs
+	DYNALLSTAT(graph,cg1,cg1_sz);
+	DYNALLSTAT(graph,cg2,cg2_sz);
+	DYNALLOC2(graph,cg1,cg1_sz,g1.m,g1.n,"malloc");
+	DYNALLOC2(graph,cg2,cg2_sz,g2.m,g2.n,"malloc");
+
+	densenauty(g1.g,lab1,ptn,orbits,&options,&stats,g1.m,g1.n,cg1);
+	densenauty(g2.g,lab2,ptn,orbits,&options,&stats,g2.m,g2.n,cg2);
+
+	//compare canonically labeled graphs
+	bool is_isomorphic = true;
+	for (int k = 0; k < g1.m*(size_t)g1.n; ++k)
+		if (cg1[k] != cg2[k])
+			is_isomorphic = false;
+
+	if(!is_isomorphic)
+		return NULL;
+
+	char **res = malloc(g1.n*sizeof(char*));
+	for(int i = 0; i<g1.n; i++)
+		res[i] = malloc(4);
+
+	for(int i = 0; i<g1.n; i++)
+		memcpy(res[lab2[i]], g1.colors[lab1[i]], 4);
+
+	DYNFREE(lab1, lab1_sz);
+	DYNFREE(lab2, lab2_sz);
+	DYNFREE(ptn, ptn_sz);
+	DYNFREE(orbits, orbits_sz);
+	DYNFREE(cg1, cg1_sz);
+	DYNFREE(cg2, cg2_sz);
+	return res;
+}
+
+void ajouterMoleculeDansFamille(TABLEAUFAMILLES tf, int indiceFamille, char *m, GRAPH_NAUTY g)
 {
-	tf.familles[indiceFamille].nbMolecules++;
-	tf.familles[indiceFamille].nomMolecules = realloc(tf.familles[indiceFamille].nomMolecules, tf.familles[indiceFamille].nbMolecules*sizeof(char*)) ;
-	tf.familles[indiceFamille].nomMolecules[tf.familles[indiceFamille].nbMolecules - 1] = malloc((strlen(m)+1)*sizeof(char));
-	strcpy(tf.familles[indiceFamille].nomMolecules[tf.familles[indiceFamille].nbMolecules - 1], m);
+	FAMILLE *f = &tf.familles[indiceFamille];
+	f->nbMolecules++;
+	f->nomMolecules = realloc(f->nomMolecules, f->nbMolecules*sizeof(char*));
+	f->nomMolecules[f->nbMolecules - 1] = malloc((strlen(m)+1)*sizeof(char));
+	strcpy(f->nomMolecules[f->nbMolecules - 1], m);
+
+	f->molecules = realloc(f->molecules, f->nbMolecules*sizeof(MOLECULE_FAMILLE));
+	f->molecules[f->nbMolecules - 1].nomMolecule = malloc((strlen(m)+1)*sizeof(char));
+	strcpy(f->molecules[f->nbMolecules - 1].nomMolecule, m);
+	f->molecules[f->nbMolecules -1].colors = colorMapping(g, *f);
 }
 
 void nouvelleFamille(TABLEAUFAMILLES *tf, char *m, GRAPH_NAUTY g)
 {
 	FAMILLE f;
+	MOLECULE_FAMILLE *mols = malloc(sizeof(MOLECULE_FAMILLE));
+
+	mols->nomMolecule = malloc((strlen(m)+1)*sizeof(char));
+	strcpy(mols->nomMolecule, m);
+	mols->colors = malloc(g.n*sizeof(char*));
+	for(int i = 0; i<g.n; ++i){
+		mols->colors[i] = malloc(4);
+		memcpy(mols->colors[i], g.colors[i], 4);
+	}
+	f.molecules = mols;
 
 	f.graphe = g;
 	f.nbMolecules = 1;
 	f.nomMolecules = malloc(sizeof(char *));
 	f.nomMolecules[f.nbMolecules - 1] = malloc((strlen(m)+1)*sizeof(char));
 	strcpy(f.nomMolecules[f.nbMolecules - 1], m);
+
 
 	tf->nbFamilles++;
 	tf->familles = realloc(tf->familles, tf->nbFamilles * sizeof(FAMILLE));
@@ -263,9 +351,9 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 		if(indiceFamille != -1)
 		{
 			// Ajout de la molécule courante dans sa famille
-			ajouterMoleculeDansFamille(tf, indiceFamille, nomsFichiers[i]);
+			ajouterMoleculeDansFamille(tf, indiceFamille, nomsFichiers[i], g);
 			// Le graphe est déjà stocké dans la famille, il faut le free.
-			free(g.g);
+			freeGrapheNauty(g);
 		}
 
 		else
@@ -288,18 +376,44 @@ void afficherFamilles(TABLEAUFAMILLES tf)
 
 		for(int j = 0; j < tf.familles[i].nbMolecules; j++)
 		{
-			printf("%s\n", tf.familles[i].nomMolecules[j]);
+			printf("%s", tf.familles[i].molecules[j].nomMolecule);
+			if(tf.familles[i].molecules[j].colors){
+				printf(" colors : ");
+				for(int k = 0; k<tf.familles[i].graphe.n; ++k){
+					printf("%s ", tf.familles[i].molecules[j].colors[k]);
+				}
+			}
+			printf("\n");
 		}
 
 		printf("\n");
 	}
 }
 
+void freeGrapheNauty(GRAPH_NAUTY gn){
+	free(gn.g);
+	for(int i = 0; i < gn.n; ++i)
+		free(gn.colors[i]);
+	free(gn.colors);
+}
+
+void freeMoleculeFamille(MOLECULE_FAMILLE mf, int n){
+	free(mf.nomMolecule);
+	if(mf.colors){
+		for(int i = 0; i<n; ++i)
+			free(mf.colors[i]);
+		free(mf.colors);
+	}
+}
+
 void freeFamille(FAMILLE f){
-	free(f.graphe.g);
-	for(int i = 0; i<f.nbMolecules; ++i)
+	freeGrapheNauty(f.graphe);
+	for(int i = 0; i<f.nbMolecules; ++i){
 		free(f.nomMolecules[i]);
+		freeMoleculeFamille(f.molecules[i], f.graphe.n);
+	}
 	free(f.nomMolecules);
+	free(f.molecules);
 }
 
 void libererMemoire(TABLEAUFAMILLES tf)
