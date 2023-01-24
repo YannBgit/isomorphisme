@@ -9,7 +9,7 @@
 // STRUCTURES
 // Structure famille
 typedef struct graph_nauty{
-	int n, m;
+	int n, m, nauty_m;
 	size_t size;
 	graph *g;
 	char **colors; //atom labels are stored as 3 characters in .sdf files

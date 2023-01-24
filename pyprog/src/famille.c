@@ -123,8 +123,10 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 		if(line) free(line);
 	}
 	//create graph & read edges
-	graph *g = ALLOCS((m),(n)*sizeof(graph));
-	EMPTYGRAPH(g,m,n);
+	int nauty_m = SETWORDSNEEDED(n);
+	printf("nauty_m : %d\n", nauty_m);
+	graph *g = ALLOCS((nauty_m),(n)*sizeof(graph));
+	EMPTYGRAPH(g,nauty_m,n);
 	for(int i = 0; i<m; ++i){
 		line = NULL;
 		l = 0;
@@ -152,12 +154,13 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 	    printf("moleculeVersGraphe - edge #%d : error reading e2\n", i);
 	    exit(1);
 	  }
-		ADDONEEDGE(g, e1-1, e2-1, m);
+		ADDONEEDGE(g, e1-1, e2-1, nauty_m);
 		if(line) free(line);
 	}
 	GRAPH_NAUTY gn = {.n = n,
-			              .m = m,
-										.size=(m)*(n)*sizeof(graph),
+										.m = m,
+			              .nauty_m = nauty_m,
+										.size=(nauty_m)*(n)*sizeof(graph),
 										.g=g,
 										.colors = colors,
 									 };
@@ -186,15 +189,15 @@ bool graphesIdentiques(GRAPH_NAUTY g1, GRAPH_NAUTY g2)
 	//store canonically labeled graphs
 	DYNALLSTAT(graph,cg1,cg1_sz);
 	DYNALLSTAT(graph,cg2,cg2_sz);
-	DYNALLOC2(graph,cg1,cg1_sz,g1.m,g1.n,"malloc");
-	DYNALLOC2(graph,cg2,cg2_sz,g2.m,g2.n,"malloc");
+	DYNALLOC2(graph,cg1,cg1_sz,g1.nauty_m,g1.n,"malloc");
+	DYNALLOC2(graph,cg2,cg2_sz,g2.nauty_m,g2.n,"malloc");
 
-	densenauty(g1.g,lab,ptn,orbits,&options,&stats,g1.m,g1.n,cg1);
-	densenauty(g2.g,lab,ptn,orbits,&options,&stats,g2.m,g2.n,cg2);
+	densenauty(g1.g,lab,ptn,orbits,&options,&stats,g1.nauty_m,g1.n,cg1);
+	densenauty(g2.g,lab,ptn,orbits,&options,&stats,g2.nauty_m,g2.n,cg2);
 
 	//compare canonically labeled graphs
 	bool is_isomorphic = true;
-	for (int k = 0; k < g1.m*(size_t)g1.n; ++k)
+	for (int k = 0; k < g1.nauty_m*(size_t)g1.n; ++k)
 		if (cg1[k] != cg2[k])
 			is_isomorphic = false;
 
@@ -225,9 +228,11 @@ char **colorMapping(GRAPH_NAUTY to_map, FAMILLE ref){
 	if(g1.n != g2.n || g1.m != g2.m)
 		return NULL;
 	//TODO : il y a un problème interne à nauty avec les graphes à 0 arêtes, à investiguer
+	//prolly fixed tho
+	/*
 	if(g1.m == 0){
 		return NULL;
-	}
+	}*/
 	// Comparer les graphes g1 et g2, renvoyer true s'ils sont identiques, false sinon
 	DEFAULTOPTIONS_GRAPH(options);
 	options.getcanon = TRUE;
@@ -246,15 +251,15 @@ char **colorMapping(GRAPH_NAUTY to_map, FAMILLE ref){
 	//store canonically labeled graphs
 	DYNALLSTAT(graph,cg1,cg1_sz);
 	DYNALLSTAT(graph,cg2,cg2_sz);
-	DYNALLOC2(graph,cg1,cg1_sz,g1.m,g1.n,"malloc");
-	DYNALLOC2(graph,cg2,cg2_sz,g2.m,g2.n,"malloc");
+	DYNALLOC2(graph,cg1,cg1_sz,g1.nauty_m,g1.n,"malloc");
+	DYNALLOC2(graph,cg2,cg2_sz,g2.nauty_m,g2.n,"malloc");
 
-	densenauty(g1.g,lab1,ptn,orbits,&options,&stats,g1.m,g1.n,cg1);
-	densenauty(g2.g,lab2,ptn,orbits,&options,&stats,g2.m,g2.n,cg2);
+	densenauty(g1.g,lab1,ptn,orbits,&options,&stats,g1.nauty_m,g1.n,cg1);
+	densenauty(g2.g,lab2,ptn,orbits,&options,&stats,g2.nauty_m,g2.n,cg2);
 
 	//compare canonically labeled graphs
 	bool is_isomorphic = true;
-	for (int k = 0; k < g1.m*(size_t)g1.n; ++k)
+	for (int k = 0; k < g1.nauty_m*(size_t)g1.n; ++k)
 		if (cg1[k] != cg2[k])
 			is_isomorphic = false;
 
