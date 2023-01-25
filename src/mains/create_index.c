@@ -13,11 +13,9 @@ int main()
 
 	// Extraction des molécules
 	extraireMolecules(F);
+	
 	// Recherche d'isomorphismes
-
 	TABLEAUFAMILLES tf = classerMolecules("data", nomSource);
-	// Affichage des familles
-	afficherFamilles(tf);
 
 	//Serialisation des familles
 	FILE *out = fopen("index.txt", "w");

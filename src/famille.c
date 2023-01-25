@@ -5,7 +5,6 @@
 // FONCTIONS
 char **tableauFichiers(int *nbTotalMolecules, char *dir, char *ignore)
 {
-	printf("Enter tableauFichiers\n");
 	*nbTotalMolecules = 0;
 	struct dirent *dp;
 	DIR *dfd;
@@ -53,7 +52,6 @@ char **tableauFichiers(int *nbTotalMolecules, char *dir, char *ignore)
 	  closedir(dfd);
 
     return allfiles;
-		printf("Exit tableauFichiers\n");
 }
 
 GRAPH_NAUTY moleculeVersGraphe(FILE *F)
@@ -124,7 +122,6 @@ GRAPH_NAUTY moleculeVersGraphe(FILE *F)
 	}
 	//create graph & read edges
 	int nauty_m = SETWORDSNEEDED(n);
-	printf("nauty_m : %d\n", nauty_m);
 	graph *g = ALLOCS((nauty_m),(n)*sizeof(graph));
 	EMPTYGRAPH(g,nauty_m,n);
 	for(int i = 0; i<m; ++i){
@@ -338,23 +335,24 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 	for(int i = 0; i < nbTotalMolecules; i++)
 	{
 		// Ouverture du fichier de la molécule courante
-		printf("File %d : %s\n", i, nomsFichiers[i]);
+		printf("File %d | %d classes\r", i, tf.nbFamilles);
 		char *filename = malloc(strlen(dir) + 1 + strlen(nomsFichiers[i]) + 1);
 		sprintf(filename, "%s/%s", dir, nomsFichiers[i]);
 		FILE *F = fopen(filename, "r");
 
+		int n = strlen(nomsFichiers[i]);
+		nomsFichiers[i][n-4] = 0;
 
 		// Calcul du graphe de la molécule courante
 		GRAPH_NAUTY g = moleculeVersGraphe(F);
-		printf("n = %d vertices, m=%d edges\n", g.n, g.m);
 		fclose(F);
 
 		// On cherche l'indice de la famille à laquele appartient la molécule courante
 		int indiceFamille = recupererIndiceFamille(g, tf);
-		printf("indiceFamille=%d\n", indiceFamille);
 		// Si l'indice ne vaut pas -1, on stock la molécule dans sa famille, sinon, on crée une famille
 		if(indiceFamille != -1)
 		{
+
 			// Ajout de la molécule courante dans sa famille
 			ajouterMoleculeDansFamille(tf, indiceFamille, nomsFichiers[i], g);
 			// Le graphe est déjà stocké dans la famille, il faut le free.
@@ -369,6 +367,7 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 		free(filename);
 		free(nomsFichiers[i]);
 	}
+	printf("%d classes\n", tf.nbFamilles);
 	free(nomsFichiers);
 	return tf;
 }

@@ -220,7 +220,7 @@ void extraireMolecules(FILE *F)
 	   	while(1)
 		 	{
 				// Récupération de la ligne
-				printf("file %d\n", i);
+				printf("File %d\r", i);
 				n = 0;
 				if(line) free(line);
 	      n = custom_getline(&line, &n, F);
@@ -242,10 +242,8 @@ void extraireMolecules(FILE *F)
 	        if(strcmp(line, "> <ChEBI Name>\n") == 0)
 					{
 						fputs(line, dest);
-						printf("found name\n");
 						m = 0;
 						m = custom_getline(&nom, &m, F);
-						printf("%s", nom);
 						fputs(nom, dest);
 						nom[m-1] = 0; //strip newline from nom
 	          sprintf(name, "data/%s.sdf", nom);
