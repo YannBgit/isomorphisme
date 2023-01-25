@@ -1,3 +1,6 @@
+#ifndef FAMILLE_H
+#define FAMILLE_H
+
 // LIBRAIRIES
 #include <stdlib.h>
 #include <string.h>
@@ -74,3 +77,5 @@ void freeFamille(FAMILLE f);
 
 // Libère toute la mémoire utilisée par le tableau de familles, comprenant les graphes, les tableaux de noms de molécules et les tableaux de familles
 void libererMemoire(TABLEAUFAMILLES tf);
+
+#endif /* end of include guard: FAMILLE_H */

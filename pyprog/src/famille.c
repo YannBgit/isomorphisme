@@ -397,27 +397,27 @@ void afficherFamilles(TABLEAUFAMILLES tf)
 
 void freeGrapheNauty(GRAPH_NAUTY gn){
 	free(gn.g);
-	for(int i = 0; i < gn.n; ++i)
-		free(gn.colors[i]);
-	free(gn.colors);
+	if(gn.colors){
+		for(int i = 0; i < gn.n; ++i)
+			free(gn.colors[i]);
+		free(gn.colors);
+	}
 }
 
 void freeMoleculeFamille(MOLECULE_FAMILLE mf, int n){
 	free(mf.nomMolecule);
-	if(mf.colors){
-		for(int i = 0; i<n; ++i)
-			free(mf.colors[i]);
-		free(mf.colors);
-	}
+	for(int i = 0; i<n; ++i)
+		free(mf.colors[i]);
+	free(mf.colors);
 }
 
 void freeFamille(FAMILLE f){
 	freeGrapheNauty(f.graphe);
 	for(int i = 0; i<f.nbMolecules; ++i){
-		free(f.nomMolecules[i]);
+		if(f.nomMolecules) free(f.nomMolecules[i]);
 		freeMoleculeFamille(f.molecules[i], f.graphe.n);
 	}
-	free(f.nomMolecules);
+	if(f.nomMolecules) free(f.nomMolecules);
 	free(f.molecules);
 }
 
