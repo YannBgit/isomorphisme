@@ -3,6 +3,7 @@ CC			:= gcc
 CFLAGS		:= -Wall -Ofast -Ilib -Isrc
 SRC_DIR		:= src
 SRC_EXT		:= .c
+SRC_FILES	:= *.sdf
 LDFLAGS		:= -lm -Llib -l:nauty.a -g
 OBJ_EXT		:= .o
 DATA_DIR	:= data
@@ -48,6 +49,7 @@ clean:
 	rm -f $(NAME_CREATE) $(NAME_SEARCH) $(INDEX_FILE)
 	rm -rf $(BUILD_DIR)
 	rm -rf $(DATA_DIR)
+	rm -f $(SRC_FILES)
 	mkdir $(DATA_DIR)
 	clear
 
