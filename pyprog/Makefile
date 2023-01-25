@@ -20,7 +20,10 @@ INDEX_FILE	:= index.txt
 
 all: $(NAME_CREATE) $(NAME_SEARCH)
 
-run: $(INDEX_FILE) $(NAME_SEARCH)
+setup:
+	mkdir -p $(DATA_DIR)
+
+run: $(INDEX_FILE) $(NAME_SEARCH) setup
 	./$(NAME_SEARCH) 27732
 
 $(INDEX_FILE): $(NAME_CREATE)
