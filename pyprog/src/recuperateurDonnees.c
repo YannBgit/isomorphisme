@@ -137,6 +137,37 @@ FILE *recupererFichier()
 	}
 }
 
+FILE *recupererUneMolecule(int chebi_id){
+	char url_buf[256];
+	char filename_buf[128];
+	char *url_pattern = "'https://www.ebi.ac.uk/chebi/saveStructure.do?sdf=true&chebiId=%d&imageId=0'";
+	char *filename_pattern = "CHEBI_%d.sdf";
+
+	sprintf(url_buf, url_pattern, chebi_id);
+	sprintf(filename_buf, filename_pattern, chebi_id);
+
+	char command[512];
+	sprintf(command, "wget -O %s %s", filename_buf, url_buf);
+
+	int rc = system(command);
+	if(rc != 0){
+		return NULL;
+	}
+
+	//check if file is zero-length (wget error)
+	FILE *out = fopen(filename_buf, "r");
+	if(fseek(out, 0L, SEEK_END) == -1){
+		return NULL;
+	}
+	if(ftell(out) == 0 || ftell(out) == -1L){ //invalid read
+		return NULL;
+	}
+	if(fseek(out, 0L, SEEK_SET) == -1){
+		return NULL;
+	}
+	return out;
+}
+
 char *recupererNomFichier(char *dir)
 {
 	struct dirent *dp;

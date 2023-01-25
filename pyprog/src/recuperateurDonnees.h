@@ -11,6 +11,9 @@
 // Télécharge le fichier (dans ../data) contenant les molécules avec une url et le décompresse, puis renvoie le pointeur vers ce fichier
 FILE *recupererFichier();
 
+// Télécharge un fichier .sdf ChEBI à partir d'un id
+FILE *recupererUneMolecule(int chebi_id);
+
 // Renvoie le nom du fichier extrait
 char *recupererNomFichier(char *dir);
 
