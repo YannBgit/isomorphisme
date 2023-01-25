@@ -24,8 +24,8 @@ all: $(NAME_CREATE) $(NAME_SEARCH)
 setup:
 	mkdir -p $(DATA_DIR)
 
-run: $(INDEX_FILE) $(NAME_SEARCH) setup
-	./$(NAME_SEARCH) 27732
+run: $(INDEX_FILE) $(NAME_SEARCH)
+	./$(NAME_SEARCH)
 
 $(INDEX_FILE): $(NAME_CREATE)
 	./$(NAME_CREATE)

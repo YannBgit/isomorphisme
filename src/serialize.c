@@ -44,7 +44,6 @@ GRAPH_NAUTY readGraphSimple(FILE *in){
   if(in == NULL)
   {
       printf("Fichier introuvable : conversion en graphe impossible\n");
-
       exit(1);
   }
   char buf_delim[4];

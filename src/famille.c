@@ -321,7 +321,6 @@ void nouvelleFamille(TABLEAUFAMILLES *tf, char *m, GRAPH_NAUTY g)
 
 TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 {
-	printf("Enter classerMolecules\n");
 	// Création du tableau de familles
 	TABLEAUFAMILLES tf;
 	tf.nbFamilles = 0;
@@ -335,7 +334,6 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 	for(int i = 0; i < nbTotalMolecules; i++)
 	{
 		// Ouverture du fichier de la molécule courante
-		printf("File %d | %d classes\r", i, tf.nbFamilles);
 		char *filename = malloc(strlen(dir) + 1 + strlen(nomsFichiers[i]) + 1);
 		sprintf(filename, "%s/%s", dir, nomsFichiers[i]);
 		FILE *F = fopen(filename, "r");
@@ -367,7 +365,8 @@ TABLEAUFAMILLES classerMolecules(char *dir, char *ignore)
 		free(filename);
 		free(nomsFichiers[i]);
 	}
-	printf("%d classes\n", tf.nbFamilles);
+
+	printf("Nombre de familles trouvées : %d\n", tf.nbFamilles);
 	free(nomsFichiers);
 	return tf;
 }

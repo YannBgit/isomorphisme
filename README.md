@@ -4,9 +4,9 @@ Projet de recherche d'isomorphismes entre molécules
 Réalisé par :
 BARBIER Yann \\ ABERKANE Walid \\ GOUY Emeric \\ CHALAUD Jean-Christophe \\ RAZAFIMBELO Fanoa
 
-Pour exécuter les commandes ci-dessous, ouvrir une console dans le répertoire de ce README.
+Ce projet contient par défaut une librairie nauty compilée, mais en cas d'incompatibilité avec votre système, il est nécessaire de compiler la librairie vous-même puis d'insérer les fichiers "nauty.h" et "nauty.a" dans le répertoire "/lib".
 
-Ce projet nécessite d'insérer manuellement les fichiers de la libraire nauty (`nauty.h` et `nauty.a`) dans le dossier `/lib`
+Pour exécuter les commandes ci-dessous, ouvrir une console dans le répertoire de ce README.
 
 - Compiler le programme :
 ```sh

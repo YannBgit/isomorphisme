@@ -258,7 +258,7 @@ void extraireMolecules(FILE *F)
 				if(nom) free(nom);
 				i+=1;
 	    }
-			printf("Number of files written : %d\n", i);
+			printf("Nombre de fichiers écrits : %d\n", i);
 	}
   fclose(F);
 }
